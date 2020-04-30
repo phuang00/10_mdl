@@ -58,7 +58,7 @@ void my_main() {
   screen t;
   zbuffer zb;
   color g;
-  double step_3d = 20;
+  double step_3d = 100;
   double theta;
 
   //Lighting values here for easy access
@@ -72,7 +72,7 @@ void my_main() {
   light[LOCATION][1] = 0.75;
   light[LOCATION][2] = 1;
 
-  light[COLOR][RED] = 0;
+  light[COLOR][RED] = 255;
   light[COLOR][GREEN] = 255;
   light[COLOR][BLUE] = 255;
 
@@ -145,17 +145,25 @@ void my_main() {
                op[i].op.sphere.d[0],op[i].op.sphere.d[1],
                op[i].op.sphere.d[2],
                op[i].op.sphere.r);
+        add_sphere(tmp, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
+        matrix_mult(peek(systems), tmp);
         if (op[i].op.sphere.constants != NULL)
           {
             printf("\tconstants: %s",op[i].op.sphere.constants->name);
+            struct constants *c = op[i].op.sphere.constants->s.c;
+            g.red = c->red;
+            g.blue = c->blue;
+            g.green = c->green;
+            draw_polygons(tmp, t, zb, view, light, g, c);
+          }
+        else
+          {
+            draw_polygons(tmp, t, zb, view, light, ambient, reflect);
           }
         if (op[i].op.sphere.cs != NULL)
           {
             printf("\tcs: %s",op[i].op.sphere.cs->name);
           }
-        add_sphere(tmp, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
-        matrix_mult(peek(systems), tmp);
-        draw_polygons(tmp, t, zb, view, light, ambient, reflect);
         tmp->lastcol = 0;
         break;
       case TORUS:
@@ -165,17 +173,24 @@ void my_main() {
                op[i].op.torus.r0,op[i].op.torus.r1);
         add_torus(tmp, op[i].op.torus.d[0],op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
         matrix_mult(peek(systems), tmp);
-        draw_polygons(tmp, t, zb, view, light, ambient, reflect);
-        tmp->lastcol = 0;
         if (op[i].op.torus.constants != NULL)
           {
             printf("\tconstants: %s",op[i].op.torus.constants->name);
+            struct constants *c = op[i].op.torus.constants->s.c;
+            g.red = c->red;
+            g.blue = c->blue;
+            g.green = c->green;
+            draw_polygons(tmp, t, zb, view, light, g, c);
+          }
+        else
+          {
+            draw_polygons(tmp, t, zb, view, light, ambient, reflect);
           }
         if (op[i].op.torus.cs != NULL)
           {
             printf("\tcs: %s",op[i].op.torus.cs->name);
           }
-
+        tmp->lastcol = 0;
         break;
       case BOX:
         printf("Box: d0: %6.2f %6.2f %6.2f d1: %6.2f %6.2f %6.2f",
@@ -185,17 +200,24 @@ void my_main() {
                op[i].op.box.d1[2]);
         add_box(tmp, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
         matrix_mult(peek(systems), tmp);
-        draw_polygons(tmp, t, zb, view, light, ambient, reflect);
-        tmp->lastcol = 0;
         if (op[i].op.box.constants != NULL)
           {
             printf("\tconstants: %s",op[i].op.box.constants->name);
+            struct constants *c = op[i].op.box.constants->s.c;
+            g.red = c->red;
+            g.blue = c->blue;
+            g.green = c->green;
+            draw_polygons(tmp, t, zb, view, light, g, c);
+          }
+        else
+          {
+            draw_polygons(tmp, t, zb, view, light, ambient, reflect);
           }
         if (op[i].op.box.cs != NULL)
           {
             printf("\tcs: %s",op[i].op.box.cs->name);
           }
-
+        tmp->lastcol = 0;
         break;
       case LINE:
         printf("Line: from: %6.2f %6.2f %6.2f to: %6.2f %6.2f %6.2f",
